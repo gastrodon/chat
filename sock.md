@@ -1,19 +1,22 @@
 # Outgoing
 
 ### Ping the websocket server
-| type          | `ping`
+| field         | description
 | ---           | ---
+| type          | `ping`
 | time          | ping timestamp. `Pong` from the server should be the same timestamp
 
 ### Pong a server ping
-| type          | `pong`
+| field         | description
 | ---           | ---
+| type          | `pong`
 | time          | Server timestamp received from this ping
 
 ### Send a message to a room
 
-| type          | `message`
+| field         | description
 | ---           | ---  
+| type          | `message`
 | key           | Session key of this user instance
 | content       | String content of this message
 | room_id       | Message destination room UUID
@@ -22,16 +25,18 @@ A user must have joined a room and have permission to send messages
 
 ### Read a message in a room
 
-| type          | `read`
+| field         | description
 | ---           | ---
+| type          | `read`
 | message_id    | Message ID in it's Room
 
 Mark a message in a room as being read
 
 ### Invite a user to a room
 
-| type          | `invite`
+| field         | description
 | ---           | ---
+| type          | `invite`
 | key           | Session key of this user instance
 | user_id       | User UUID to invite
 | room_id       | Room UUID to invite to
@@ -42,19 +47,22 @@ If this room is closed, only room administrators may invite users
 # Incoming
 
 ### Ping the client
-| type          | `ping`
+| field         | description
 | ---           | ---
+| type          | `ping`
 | time          | ping timestamp. `Pong` from the client should be the same timestamp
 
 ### Pong a client ping
-| type          | `pong`
+| field         | description
 | ---           | ---
+| type          | `pong`
 | time          | Client timestamp received from this ping
 
 ### Receive a message in a room
 
-| type          | `message`
+| field         | description
 | ---           | ---
+| type          | `message`
 | time          | Message send UNIX timestamp
 | content       | String content of this message
 | user_id       | Message author UUID
@@ -66,8 +74,9 @@ Messages should only be stored by the client, and never the server.
 
 ### Receive a message read receipt
 
-| type          | `read`
+| field         | description
 | ---           | ---
+| type          | `read`
 | message_id    | Message ID in it's room
 | user_id       | User UUID who did read this message
 
@@ -76,8 +85,9 @@ Handled by the client entirely
 
 ### Receive a room invite
 
-| type          | `invite`
+| field         | description
 | ---           | ---
+| type          | `invite`
 | user_id       | Inviter UUID
 | room_id       | Room invited to UUID
 
@@ -85,8 +95,9 @@ User should then `enter` this room if they choose to do so. If this room is clos
 
 ### Be kicked from a room
 
-| type          | `kick`
+| field         | description
 | ---           | ---
+| type          | `kick`
 | room_id       | Room kicked from UUID
 | message       | Message for exit, if any given
 | permanent     | `true` \| `false`
@@ -96,7 +107,8 @@ but a kicked user will not be able to listen or send to that room
 
 ### User join or exit a room
 
-| type          | `enter` \| `exit`
+| field         | description
 | ---           | ---
+| type          | `enter` \| `exit`
 | user_id       | User UUID who did enter or exit this room
 | room_id       | Room UUID that had a user enter or exit
