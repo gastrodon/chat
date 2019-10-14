@@ -28,6 +28,38 @@ response `403` - you may not POST a new user
 | ---           | ---           | ---
 | error         | string        | Error description
 
+### Modify a username
+
+PUT `/user`
+
+params
+
+| field         | type          | description   | request
+| ---           | ---           | ---           | ---
+| key           | string        | Session key   | true
+
+PUT data
+
+| field         | type          | description           | required
+| ---           | ---           | ---                   | ---
+| username      | string        | New username to use   | true
+
+response `204` - this username was modified
+
+response `400` - bad or malformed request
+
+| field         | type          | description
+| ---           | ---           | ---
+| error         | string        | Error description
+
+response `401` - you are not authorized
+
+| field         | type          | description
+| ---           | ---           | ---
+| error         | string        | Error description
+
+
+
 ### Get information about some user
 
 GET `/user/{user_id}`
