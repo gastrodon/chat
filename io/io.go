@@ -93,7 +93,7 @@ func NewUser(uname string, passwd string) models.User {
  * user_id  string  -> UUID of this user. Should exists in `Users` map
  * passwd   string  -> Suspected password of this user.
  *
- * return   bool    -> Does the given passowrd belong to the given user?
+ * return   bool    -> Does the given password belong to the given user?
  *          error   -> No such user by this ID does exist
  */
 func CheckPasswd(user_id string, passwd string) (bool, error) {
