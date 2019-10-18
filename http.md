@@ -44,7 +44,11 @@ PUT data
 | ---           | ---           | ---                   | ---
 | username      | string        | New username to use   | true
 
-response `204` - this username was modified
+response `200` - this username was modified
+
+| field         | type          | description
+| ---           | ---           | ---
+| username      | string        | New username
 
 response `400` - bad or malformed request
 
