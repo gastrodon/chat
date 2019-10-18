@@ -24,7 +24,7 @@ func postUserTest(test *testing.T, data string) {
 	}
 
 	handler.ServeHTTP(recorder, request)
-    var response struct{
+    var response struct {
         Key string `json:"key"`
         UserID string `json:"user_id"`
     }
@@ -45,19 +45,18 @@ func postUserTest(test *testing.T, data string) {
 }
 
 func putUserTest(test *testing.T, data string, key string) {
-	var post_data string = data
 	var handler http.HandlerFunc = http.HandlerFunc(HandleUser)
 	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
 
 	var request *http.Request
 	var err error
-	request, err = http.NewRequest("PUT", fmt.Sprintf("/user?key=%s", key), strings.NewReader(post_data))
+	request, err = http.NewRequest("PUT", fmt.Sprintf("/user?key=%s", key), strings.NewReader(data))
 	if err != nil {
 		test.Fatal(err)
 	}
 
 	handler.ServeHTTP(recorder, request)
-    var response struct{
+    var response struct {
         Username string `json:"username"`
     }
     json.Unmarshal([]byte(recorder.Body.String()), &response)
@@ -70,6 +69,40 @@ func putUserTest(test *testing.T, data string, key string) {
         test.Errorf("response.Code expected: 200, got: %d", recorder.Code)
         test.Errorf("response: %s", recorder.Body.String())
     }
+}
+
+func getUserTest(test *testing.T, id string) {
+	var handler http.HandlerFunc = http.HandlerFunc(HandleUserTree)
+	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
+
+	var request *http.Request
+	var err error
+	var path string = fmt.Sprintf("/user/%s", id)
+	request, err = http.NewRequest("GET", path, nil)
+
+	if err != nil {
+		test.Fatal(err)
+	}
+
+	handler.ServeHTTP(recorder, request)
+	var response struct {
+		Username string `json:"username"`
+		UserID string `json:"user_id"`
+	}
+	json.Unmarshal([]byte(recorder.Body.String()), &response)
+
+	if response.Username != "foobar" {
+		test.Errorf("username expected: foobar, got: %s", response.Username)
+	}
+
+	if response.UserID != id {
+		test.Errorf("user_id expected: %s, got: %s", id, response.UserID)
+	}
+
+	if recorder.Code != 200 {
+        test.Errorf("response.Code expected: 200, got: %d", recorder.Code)
+        test.Errorf("response: %s", recorder.Body.String())
+	}
 }
 
 func Test_postHandleUser(test *testing.T) {
@@ -91,7 +124,7 @@ func Test_putNewUsername(test *testing.T) {
 	var user models.User = io.NewUser("foobar", "foobar2000")
 
 	if user.Name != "foobar" {
-		test.Errorf("user.Name expected: foobar, got: %s", user.Name)
+		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
 	}
 
 	key, err = io.NewKey(user.ID, "foobar2000")
@@ -115,4 +148,14 @@ func Test_putNewUsername(test *testing.T) {
 	if user.Name != "foobar3000" {
 		test.Errorf("user.Name expected: foobar3000, got: %s", user.Name)
 	}
+}
+
+func Test_getHandleUserTree(test *testing.T) {
+	var user models.User = io.NewUser("foobar", "foobar2000")
+
+	if user.Name != "foobar" {
+		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
+	}
+
+	getUserTest(test, user.ID)
 }

@@ -163,6 +163,21 @@ func UserFromKey(key string) (models.User, bool, error) {
 	return user, true, nil
 }
 
+func UserFromID(id string) (models.User, bool, error) {
+	var exists bool
+	var user models.User
+
+	user, exists = Users[id]
+
+	if !exists {
+		return user, false, nil
+	}
+
+	return user, true, nil
+
+
+}
+
 /**
  * Create a room
  * room_name        -> Name of this room. Request handlers should take care of name defaults.

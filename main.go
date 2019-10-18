@@ -15,6 +15,7 @@ func main() {
 	}
 
 	http.HandleFunc("/user", server.HandleUser)
+	http.HandleFunc("/user/", server.HandleUserTree)
 
 	http.ListenAndServe(port, nil)
 }

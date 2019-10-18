@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 func putHandleUser(response http.ResponseWriter, request *http.Request) {
@@ -19,8 +20,6 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	var user models.User
 	var exists bool
 	var err error
-
-	defer request.Body.Close()
 
 	if len(request.URL.Query()["key"]) == 0 {
 		HandleHTTPErr(response, errors.New("no_key"), 401)
@@ -79,7 +78,6 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	var response_map map[string]interface{}
 	var err error
 
-	defer request.Body.Close()
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
@@ -114,6 +112,35 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	SendHTTPJsonResponse(response, response_map)
 }
 
+func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
+	var id string = strings.Replace(request.URL.Path, "/user/", "", 1)
+	var user models.User
+	var exists bool
+	var err error
+
+	var response_map map[string]interface{}
+
+	user, exists, err = io.UserFromID(id)
+
+	if !exists {
+		HandleHTTPErr(response, errors.New("no_such_user"), 404)
+		return
+	}
+
+	if err != nil {
+		HandleHTTPErr(response, err, 500)
+		return
+	}
+
+	response_map = map[string]interface{} {
+		"username":	user.Name,
+		"user_id": 	user.ID,
+	}
+
+	SendHTTPJsonResponse(response, response_map)
+	return
+}
+
 func HandleUser(response http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case "POST":
@@ -121,6 +148,14 @@ func HandleUser(response http.ResponseWriter, request *http.Request) {
 		return
 	case "PUT":
 		putHandleUser(response, request)
+		return
+	}
+}
+
+func HandleUserTree(response http.ResponseWriter, request *http.Request) {
+	switch request.Method {
+	case "GET":
+		getHandleUserTree(response, request)
 		return
 	}
 }
