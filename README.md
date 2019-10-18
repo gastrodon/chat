@@ -1,4 +1,4 @@
-[![Travis (.org)](https://img.shields.io/travis/basswaver/chat?style=flat-square)](https://travis-ci.org/basswaver/chat)
+[![Travis (.org)](https://img.shields.io/travis/basswaver/chat?logo=travis&style=flat-square)](https://travis-ci.org/basswaver/chat)
 
 ## Chat
 A small chat. Or rather a design for a small chat.
