@@ -149,6 +149,8 @@ func HandleUser(response http.ResponseWriter, request *http.Request) {
 	case "PUT":
 		putHandleUser(response, request)
 		return
+	default:
+		HandleHTTPErr(response, errors.New("bad_method"), 405)
 	}
 }
 
@@ -157,5 +159,7 @@ func HandleUserTree(response http.ResponseWriter, request *http.Request) {
 	case "GET":
 		getHandleUserTree(response, request)
 		return
+	default:
+		HandleHTTPErr(response, errors.New("bad_method"), 405)
 	}
 }
