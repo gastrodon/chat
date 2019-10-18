@@ -83,7 +83,7 @@ response `200` - user information
 
 ### Log in and get a session key
 
-POST `/token`
+POST `/key`
 
 POST data
 
@@ -112,14 +112,14 @@ response `401` - you may not log in with these credentials
 
 ### Revoke and invalidate a session key
 
-DELETE `/token`
+DELETE `/key`
 
 DELETE data
 
 | field         | type          | description                       | required
 | ---           | ---           | ---                               | ---
 | key           | string        | session key to revoke             | true
-| user_id       | string        | UUID of the user with this token  | true
+| user_id       | string        | UUID of the user with this key  | true
 
 ### Get information about some room
 
