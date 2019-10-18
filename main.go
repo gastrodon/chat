@@ -1,12 +1,12 @@
 package main
 
 import (
-    "net/http"
-    "chat/server"
+	"chat/server"
+	"net/http"
 )
 
 func main() {
-    http.HandleFunc("/user", server.HandleUser)
+	http.HandleFunc("/user", server.HandleUser)
 
-    http.ListenAndServe(":5000", nil)
+	http.ListenAndServe(":5000", nil)
 }

@@ -36,7 +36,7 @@ func assertPRNG() {
 	}
 }
 
-func random_string(size int) (string) {
+func random_string(size int) string {
 	const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
 	var byte_array []byte = make([]byte, size)
 	rand.Read(byte_array)
@@ -58,7 +58,7 @@ func random_string(size int) (string) {
  *
  * return   User    -> Created `User`
  */
-func NewUser(uname string, passwd string) (models.User) {
+func NewUser(uname string, passwd string) models.User {
 	var id string = uuid.NewV4().String()
 	var hashed hash.Hash = sha1.New()
 	hashed.Write([]byte(salt + passwd))
@@ -156,7 +156,7 @@ func UserFromKey(key string) (models.User, error) {
  *
  * return           -> UUID of this room
  */
-func NewRoom(room_name string, open bool, owner_id string) (models.Room) {
+func NewRoom(room_name string, open bool, owner_id string) models.Room {
 	var id string = uuid.NewV4().String()
 
 	var room models.Room = models.Room{

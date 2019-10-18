@@ -1,58 +1,67 @@
 package server
 
 import (
-    "log"
-    "errors"
-    "chat/io"
-    "net/http"
-    "io/ioutil"
-    "chat/models"
+	"chat/io"
+	"chat/models"
+	"encoding/json"
+	"errors"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 func postHandleUser(response http.ResponseWriter, request *http.Request) {
-    var uname, passwd []string
-    var uname_supplied, passwd_supplied bool
+	var body []byte
+	var body_json struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
 
-    var response_map map[string]interface{}
-    var err error
+	var response_map map[string]interface{}
+	var err error
 
-    request.ParseForm()
-    log.Printf("request: %s", request)
+	defer request.Body.Close()
+	body, err = ioutil.ReadAll(request.Body)
 
-    passwd, passwd_supplied = request.Form["password"]
-    log.Printf("passwd: %s", passwd)
+	if err != nil {
+		HandleHTTPErr(response, err, 500)
+		return
+	}
 
-    if !passwd_supplied {
-        HandleHTTPErr(response, errors.New("passwd_missing"), 400)
-        return
-    }
+	err = json.Unmarshal(body, &body_json)
 
-    uname, uname_supplied = request.Form["username"]
-    log.Printf("uname: %s", uname)
+	log.Printf("body_json: %s", body_json)
 
-    if !uname_supplied {
-        uname[0] = "Anonymous"
-    }
+	log.Printf("passwd: %s", body_json.Password)
+	if body_json.Password == "" {
+		HandleHTTPErr(response, errors.New("password_missing"), 400)
+		return
+	}
 
-    var user models.User = io.NewUser(uname[0], passwd[0])
-    var key string
-    key, err = io.NewKey(user.ID, passwd[0])
+	log.Printf("uname: %s", body_json.Username)
+	if body_json.Username == "" {
+		body_json.Username = "Anonymous"
+	}
 
-    if err != nil {
-        HandleHTTPErr(response, err, 500)
-    }
+	var user models.User = io.NewUser(body_json.Username, body_json.Password)
+	var key string
+	key, err = io.NewKey(user.ID, body_json.Password)
 
-    response_map = map[string]interface{} {
-        "user_id":  user.ID,
-        "key":      key,
-    }
+	if err != nil {
+		HandleHTTPErr(response, err, 500)
+	}
 
-    SendHTTPJsonResponse(response, response_map)
+	response_map = map[string]interface{}{
+		"user_id": user.ID,
+		"key":     key,
+	}
+
+	SendHTTPJsonResponse(response, response_map)
 }
 
 func HandleUser(response http.ResponseWriter, request *http.Request) {
-    switch request.Method {
-        case "POST":
-            postHandleUser(response, request)
-    }
+	switch request.Method {
+	case "POST":
+		postHandleUser(response, request)
+	}
 }
