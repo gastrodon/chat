@@ -23,6 +23,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 
 	if len(request.URL.Query()["key"]) == 0 {
 		HandleHTTPErr(response, errors.New("no_key"), 401)
+		return
 	}
 
 	var key string = request.URL.Query()["key"][0]
@@ -69,14 +70,13 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 }
 
 func postHandleUser(response http.ResponseWriter, request *http.Request) {
+	var response_map map[string]interface{}
 	var body []byte
+	var err error
 	var json_body struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
-
-	var response_map map[string]interface{}
-	var err error
 
 	body, err = ioutil.ReadAll(request.Body)
 
@@ -86,6 +86,11 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	}
 
 	err = json.Unmarshal(body, &json_body)
+
+	if err != nil {
+		HandleHTTPErr(response, errors.New("malformed_json"), 400)
+		return
+	}
 
 	if json_body.Password == "" {
 		HandleHTTPErr(response, errors.New("password_missing"), 400)
@@ -102,6 +107,7 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 
 	if err != nil {
 		HandleHTTPErr(response, err, 500)
+		return
 	}
 
 	response_map = map[string]interface{}{

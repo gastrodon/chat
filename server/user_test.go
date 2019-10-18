@@ -105,16 +105,40 @@ func getUserTest(test *testing.T, id string) {
 	}
 }
 
+func errUserTest(test *testing.T, data string, error_desc string, code int) {
+    var post_data string = data
+	var handler http.HandlerFunc = http.HandlerFunc(HandleUser)
+	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
+
+	var request *http.Request
+	var err error
+	request, err = http.NewRequest("POST", "/user", strings.NewReader(post_data))
+	if err != nil {
+		test.Fatal(err)
+	}
+
+	handler.ServeHTTP(recorder, request)
+    var response struct{
+        Error string `json:"error"`
+    }
+    json.Unmarshal([]byte(recorder.Body.String()), &response)
+
+    if response.Error != error_desc {
+	        test.Errorf("error expected: %s, got: %s", error_desc, response.Error)
+			test.Errorf("response: %s", recorder.Body.String())
+    }
+
+    if recorder.Code != code {
+        test.Errorf("response.Code expected: %d, got: %d", code, recorder.Code)
+    }
+}
+
 func Test_postHandleUser(test *testing.T) {
     postUserTest(test, "{\"username\":\"foobar\",\"password\":\"foobar2000\"}")
 }
 
 func Test_postHandleUserNoUname(test *testing.T) {
     postUserTest(test, "{\"password\":\"foobar2000\"}")
-}
-
-func Test_postHandleUserBadUname(test *testing.T) {
-    postUserTest(test, "{\"username\":42,\"password\":\"foobar2000\"}")
 }
 
 func Test_putNewUsername(test *testing.T) {
@@ -158,4 +182,16 @@ func Test_getHandleUserTree(test *testing.T) {
 	}
 
 	getUserTest(test, user.ID)
+}
+
+func Test_postHandleUserNoPasswd(test *testing.T) {
+    errUserTest(test, "{\"username\":\"foobar\"}", "password_missing", 400)
+}
+
+func Test_postHandleUserBadPasswd(test *testing.T) {
+    errUserTest(test, "{\"password\":42}", "malformed_json", 400)
+}
+
+func Test_postHandleUserBadUname(test *testing.T) {
+    errUserTest(test, "{\"username\":42,\"password\":\"foobar2000\"}", "malformed_json", 400)
 }
