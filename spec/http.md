@@ -83,9 +83,9 @@ response `200` - user information
 
 ### Log in and get a session key
 
-GET `/token`
+POST `/token`
 
-params
+POST data
 
 | field         | type          | description                   | required
 | ---           | ---           | ---                           | ---
@@ -113,6 +113,8 @@ response `401` - you may not log in with these credentials
 ### Revoke and invalidate a session key
 
 DELETE `/token`
+
+DELETE data
 
 | field         | type          | description                       | required
 | ---           | ---           | ---                               | ---
