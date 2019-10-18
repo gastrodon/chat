@@ -65,12 +65,17 @@ func Test_UserFromKey(test *testing.T) {
 	var key string
 	var fetched models.User
 	var err error
+	var exists bool
 	key, _ = NewKey(user.ID, passwd)
 
-	fetched, err = UserFromKey(key)
+	fetched, exists, err = UserFromKey(key)
+
+	if !exists {
+		test.Fatalf("User with key %s does not exist", key)
+	}
 
 	if err != nil {
-		test.Error(err)
+		test.Fatal(err)
 	}
 
 	if fetched.ID != user.ID {

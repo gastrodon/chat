@@ -50,6 +50,21 @@ func random_string(size int) string {
 	return string(byte_array)
 }
 
+func UpdateUname(user_id string, uname string) (models.User, error){
+	var user models.User
+	var exists bool
+	user, exists = Users[user_id]
+
+	if !exists {
+		var err_string string = fmt.Sprintf("No user of user_id %s", user_id)
+		return user, errors.New(err_string)
+	}
+
+	user.Name = uname
+	Users[user_id] = user
+	return Users[user_id], nil
+}
+
 /**
  * Create a user
  * uname    string  -> Username of this user. Request handlers should take care of name defaults.
@@ -129,23 +144,23 @@ func NewKey(user_id string, passwd string) (string, error) {
  *          error   -> No `User` does own this key
  *                  -> This key is registered, but points to nothing
  */
-func UserFromKey(key string) (models.User, error) {
+func UserFromKey(key string) (models.User, bool, error) {
 	var exists bool
 	var user_id string
 	var user models.User
 	user_id, exists = Session[key]
 
 	if !exists {
-		return user, errors.New("No user for this key")
+		return user, false, nil
 	}
 
 	user, exists = Users[user_id]
 
 	if !exists {
-		return user, errors.New(fmt.Sprintf("A user_id %s was found for this key, but it points to no user.", user_id))
+		return user, false, errors.New(fmt.Sprintf("key %s points to user_id %s, which does not exist", key, user_id))
 	}
 
-	return user, nil
+	return user, true, nil
 }
 
 /**
