@@ -17,4 +17,4 @@ script:
     - go test -count 1 -cpu 2 -covermode=count -coverprofile=coverage.out ./...
 
 after_success:
-    - $HOME/go/bin/goveralls -coverprofile=coverage.out -service=travis-ci
+    - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci
