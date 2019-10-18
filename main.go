@@ -14,6 +14,8 @@ func main() {
 		port = fmt.Sprintf(":%s", os.Args[1])
 	}
 
+	http.HandleFunc("/key", server.HandleKey)
+	
 	http.HandleFunc("/user", server.HandleUser)
 	http.HandleFunc("/user/", server.HandleUserTree)
 
