@@ -50,7 +50,7 @@ func random_string(size int) string {
 	return string(byte_array)
 }
 
-func UpdateUname(user_id string, uname string) (models.User, error){
+func UpdateUname(user_id string, uname string) (models.User, error) {
 	var user models.User
 	var exists bool
 	user, exists = Users[user_id]
@@ -174,7 +174,6 @@ func UserFromID(id string) (models.User, bool, error) {
 	}
 
 	return user, true, nil
-
 
 }
 
