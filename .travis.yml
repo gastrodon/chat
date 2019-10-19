@@ -14,9 +14,9 @@ install:
 
 script:
     - go build -o /dev/null chat
-    - go test -count 1 -cpu 2 -covermode=count -coverprofile=coverage.out ./...
+    - go test -race -count 1 -cpu 1,2 -covermode=atomic -coverprofile=coverage.txt ./...
 
 after_success:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci
+  - bash <(curl -s https://codecov.io/bash)
   - fi
