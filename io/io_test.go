@@ -3,6 +3,7 @@ package io
 import (
 	"chat/models"
 	"crypto/sha1"
+	"fmt"
 	"hash"
 	"testing"
 )
@@ -43,6 +44,17 @@ func Test_CheckPasswd(test *testing.T) {
 	}
 }
 
+func Test_CheckPasswdNoUser(test *testing.T) {
+	var user_id string = "foobar"
+	var err_string string = fmt.Sprintf("No user does exist with id %s", user_id)
+	var err error
+	_, err = CheckPasswd(user_id, "")
+
+	if err.Error() != err_string {
+		test.Errorf("CheckPasswd no such ID expected: %s, got: %s", err_string, err.Error())
+	}
+}
+
 func Test_NewKey(test *testing.T) {
 	var passwd string = random_string(4)
 	var user models.User = NewUser("foobar", passwd)
@@ -56,6 +68,17 @@ func Test_NewKey(test *testing.T) {
 
 	if len(key) != 32 {
 		test.Errorf("NewKey len got: %d, expected %d", len(key), 32)
+	}
+}
+
+func Test_NewKeyBadPasswd(test *testing.T) {
+	var err_string string = "Password passed does not match password stored"
+	var user models.User = NewUser("foobar", random_string(4))
+	var err error
+	_, err = NewKey(user.ID, "")
+
+	if err.Error() != err_string {
+		test.Errorf("NewKey with bad password expected: %s, got: %s", err_string, err.Error())
 	}
 }
 
@@ -80,6 +103,40 @@ func Test_UserFromKey(test *testing.T) {
 
 	if fetched.ID != user.ID {
 		test.Errorf("UserFromKey got: %s, expected: %s", fetched.ID, user.ID)
+	}
+}
+
+func Test_UserFromKeyNoUser(test *testing.T) {
+	var exists bool
+	var err error
+	_, exists, err = UserFromKey("")
+
+	if exists {
+		test.Errorf("UserFromKey no user returns exists as true")
+	}
+
+	if err != nil {
+		test.Fatal(err)
+	}
+
+}
+
+func Test_UserFromKeyDanglingID(test *testing.T) {
+	var user_id string = "foobar"
+	var key string = "barbaz"
+	Session[key] = user_id
+
+	var err_string string = fmt.Sprintf("key %s points to user_id %s, which does not exist", key, user_id)
+	var exists bool
+	var err error
+	_, exists, err = UserFromKey(key)
+
+	if exists {
+		test.Errorf("UserFromKey dangling ID returns exists as true")
+	}
+
+	if err.Error() != err_string {
+		test.Errorf("UserFromKey bad key expected: %s, got %s", err_string, err.Error())
 	}
 }
 
@@ -108,6 +165,17 @@ func Test_UpdateUname(test *testing.T) {
 
 	if user.Name != new_uname {
 		test.Errorf("UpdateUname expected: %s, got: %s", new_uname, user.Name)
+	}
+}
+
+func Test_UpdateUnameNoUser(test *testing.T) {
+	var user_id string = "foobar"
+	var err_string string = fmt.Sprintf("No user of user_id %s", user_id)
+	var err error
+	_, err = UpdateUname(user_id, "")
+
+	if err.Error() != err_string {
+		test.Errorf("UpdateUname no such ID expected: %s, got: %s", err_string, err.Error())
 	}
 }
 
@@ -146,5 +214,18 @@ func Test_UserFromID(test *testing.T) {
 	if from_id.ID != user.ID {
 		test.Errorf("UserFromID expected: %s, got: %s", user.ID, from_id.ID)
 	}
+}
 
+func Test_UserFromIDNoUser(test *testing.T) {
+	var exists bool
+	var err error
+	_, exists, err = UserFromID("")
+
+	if exists {
+		test.Error("UserFromID no user_id returns exists as true")
+	}
+
+	if err != nil {
+		test.Fatal(err)
+	}
 }
