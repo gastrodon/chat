@@ -19,6 +19,6 @@ func LogHandlerError(request *http.Request, err error) {
 	handlerErr.Printf("> [Request Body]\n%s\n> [Err]\n%s\n", request.Body, err.Error())
 }
 
-func LogInternalErr(err error) {
+func LogInternalError(err error) {
 	internalErr.Print(err.Error())
 }
