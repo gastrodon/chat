@@ -31,7 +31,7 @@ func SendHTTPJsonResponse(response http.ResponseWriter, response_map map[string]
 
 	if parse_error != nil {
 		HandleHTTPErr(response, "internal_err", 500)
-		util.LogInternalErr(parse_error)
+		util.LogInternalError(parse_error)
 		return
 	}
 
