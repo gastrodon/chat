@@ -56,14 +56,14 @@ func postKeyTest(test *testing.T, user_id string, password string) {
     }
 }
 
-func errKeyTest(test *testing.T, data string, error_desc string, code int) {
+func errKeyTest(test *testing.T, method string, data string, error_desc string, code int) {
     var post_data string = data
 	var handler http.HandlerFunc = http.HandlerFunc(HandleKey)
 	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
 
 	var request *http.Request
 	var err error
-	request, err = http.NewRequest("POST", "/key", strings.NewReader(post_data))
+	request, err = http.NewRequest(method, "/key", strings.NewReader(post_data))
 	if err != nil {
 		test.Fatal(err)
 	}
@@ -105,5 +105,9 @@ func Test_postHandleKeyWrongPasswd(test *testing.T) {
 
 	var post_data string = fmt.Sprintf("{\"user_id\":\"%s\",\"password\":\"oof!\"}", user.ID)
 
-	errKeyTest(test, post_data, "bad_password", 403)
+	errKeyTest(test, "POST", post_data, "bad_password", 403)
+}
+
+func Test_HandleKeyBadMethod(test *testing.T) {
+    errKeyTest(test, "OOOO", "", "bad_method", 405)
 }
