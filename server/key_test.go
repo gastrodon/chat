@@ -108,6 +108,36 @@ func Test_postHandleKeyWrongPasswd(test *testing.T) {
 	errKeyTest(test, "POST", post_data, "bad_password", 403)
 }
 
+func Test_postHandleKeyMissingPasswd(test *testing.T) {
+	var post_data string = "{\"user_id\":\"0\"}"
+
+	errKeyTest(test, "POST", post_data, "password_missing", 400)
+}
+
+func Test_postHandleKeyMissingUserID(test *testing.T) {
+	var post_data string = "{\"password\":\"0\"}"
+
+	errKeyTest(test, "POST", post_data, "user_id_missing", 400)
+}
+
+func Test_postHandleKeyNoSuchUser(test *testing.T) {
+	var post_data string = "{\"password\":\"0\",\"user_id\":\"0\"}"
+
+	errKeyTest(test, "POST", post_data, "no_such_user", 404)
+}
+
+func Test_postHandleKeyIntUserID(test *testing.T) {
+	var post_data string = "{\"password\":\"0\",\"user_id\":0}"
+
+	errKeyTest(test, "POST", post_data, "malformed_json", 400)
+}
+
+func Test_postHandleKeyMalformed(test *testing.T) {
+    var post_data string = "Wait, this isn't json!{{{{{{]]][:]}"
+
+    errKeyTest(test, "POST", post_data, "malformed_json", 400)
+}
+
 func Test_HandleKeyBadMethod(test *testing.T) {
     errKeyTest(test, "OOOO", "", "bad_method", 405)
 }
