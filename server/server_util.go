@@ -17,7 +17,8 @@ func HandleHTTPErr(response http.ResponseWriter, err string, code int) {
 	response_data, parse_error = json.Marshal(response_map)
 
 	if parse_error != nil {
-		http.Error(response, parse_error.Error(), 500)
+		http.Error(response, "internal_err", 500)
+		util.LogInternalError(parse_error)
 		return
 	}
 
