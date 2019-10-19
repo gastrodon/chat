@@ -18,5 +18,5 @@ script:
 
 after_success:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci
-    fi
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci
+  - fi
