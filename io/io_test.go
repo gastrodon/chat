@@ -92,3 +92,59 @@ func Test_NewRoom(test *testing.T) {
 		test.Errorf("NewRoom got: %s, expected: %s", Rooms[room.ID].ID, room.ID)
 	}
 }
+
+func Test_UpdateUname(test *testing.T) {
+	var uname string = "foobar"
+	var new_uname string = "Anonymous"
+	var passwd string = random_string(4)
+	var user models.User = NewUser(uname, passwd)
+
+	if user.Name != uname {
+		test.Errorf("NewUser expected: %s, got: %s", uname, user.Name)
+	}
+
+	UpdateUname(user.ID, new_uname)
+	user = Users[user.ID]
+
+	if user.Name != new_uname {
+		test.Errorf("UpdateUname expected: %s, got: %s", new_uname, user.Name)
+	}
+}
+
+func Test_UserFromID(test *testing.T) {
+	var uname, passwd string = random_string(4), random_string(4)
+	var user models.User = NewUser(uname, passwd)
+
+	if user.Name != uname {
+		test.Errorf("NewUser expected: %s, got: %s", uname, user.Name)
+	}
+
+	var passwd_check bool
+	var err error
+	passwd_check, err = CheckPasswd(user.ID, passwd)
+
+	if err != nil {
+		test.Fatal(err)
+	}
+
+	if !passwd_check {
+		test.Errorf("NewUser password mismatch expected: %s", passwd)
+	}
+
+	var from_id models.User
+	var exists bool
+	from_id, exists, err = UserFromID(user.ID)
+
+	if err != nil {
+		test.Fatal(err)
+	}
+
+	if !exists {
+		test.Errorf("UserFromID no such user by id %s", user.ID)
+	}
+
+	if from_id.ID != user.ID {
+		test.Errorf("UserFromID expected: %s, got: %s", user.ID, from_id.ID)
+	}
+
+}
