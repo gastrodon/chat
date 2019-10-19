@@ -3,8 +3,8 @@ package server
 import (
 	"chat/io"
 	"chat/models"
+	"chat/util"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -12,7 +12,7 @@ import (
 
 func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	var body []byte
-	var json_body struct{
+	var json_body struct {
 		Username string `json:"username"`
 	}
 
@@ -22,7 +22,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	var err error
 
 	if len(request.URL.Query()["key"]) == 0 {
-		HandleHTTPErr(response, errors.New("no_key"), 401)
+		HandleHTTPErr(response, "no_key", 401)
 		return
 	}
 
@@ -31,20 +31,21 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	user, exists, err = io.UserFromKey(key)
 
 	if err != nil {
-		HandleHTTPErr(response, err, 500)
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
 		return
 	}
 
 	if !exists {
-		HandleHTTPErr(response, errors.New("bad_key"), 401)
+		HandleHTTPErr(response, "bad_key", 401)
 		return
 	}
-
 
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		HandleHTTPErr(response, err, 500)
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
 		return
 	}
 
@@ -57,11 +58,12 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	user, err = io.UpdateUname(user.ID, json_body.Username)
 
 	if err != nil {
-		HandleHTTPErr(response, err, 500)
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
 		return
 	}
 
-	response_map = map[string]interface{} {
+	response_map = map[string]interface{}{
 		"username": user.Name,
 	}
 
@@ -81,19 +83,20 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		HandleHTTPErr(response, err, 500)
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
 		return
 	}
 
 	err = json.Unmarshal(body, &json_body)
 
 	if err != nil {
-		HandleHTTPErr(response, errors.New("malformed_json"), 400)
+		HandleHTTPErr(response, "malformed_json", 400)
 		return
 	}
 
 	if json_body.Password == "" {
-		HandleHTTPErr(response, errors.New("password_missing"), 400)
+		HandleHTTPErr(response, "password_missing", 400)
 		return
 	}
 
@@ -106,7 +109,8 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	key, err = io.NewKey(user.ID, json_body.Password)
 
 	if err != nil {
-		HandleHTTPErr(response, err, 500)
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
 		return
 	}
 
@@ -129,18 +133,19 @@ func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
 	user, exists, err = io.UserFromID(id)
 
 	if !exists {
-		HandleHTTPErr(response, errors.New("no_such_user"), 404)
+		HandleHTTPErr(response, "no_such_user", 404)
 		return
 	}
 
 	if err != nil {
-		HandleHTTPErr(response, err, 500)
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
 		return
 	}
 
-	response_map = map[string]interface{} {
-		"username":	user.Name,
-		"user_id": 	user.ID,
+	response_map = map[string]interface{}{
+		"username": user.Name,
+		"user_id":  user.ID,
 	}
 
 	SendHTTPJsonResponse(response, response_map)
@@ -156,7 +161,7 @@ func HandleUser(response http.ResponseWriter, request *http.Request) {
 		putHandleUser(response, request)
 		return
 	default:
-		HandleHTTPErr(response, errors.New("bad_method"), 405)
+		HandleHTTPErr(response, "bad_method", 405)
 	}
 }
 
@@ -166,6 +171,6 @@ func HandleUserTree(response http.ResponseWriter, request *http.Request) {
 		getHandleUserTree(response, request)
 		return
 	default:
-		HandleHTTPErr(response, errors.New("bad_method"), 405)
+		HandleHTTPErr(response, "bad_method", 405)
 	}
 }

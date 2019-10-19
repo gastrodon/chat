@@ -1,16 +1,17 @@
 package server
 
 import (
+	"chat/util"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-func HandleHTTPErr(response http.ResponseWriter, err error, code int) {
+func HandleHTTPErr(response http.ResponseWriter, err string, code int) {
 	var parse_error error
 	var response_data []byte
 	var response_map map[string]string = map[string]string{
-		"error": err.Error(),
+		"error": err,
 	}
 
 	response_data, parse_error = json.Marshal(response_map)
@@ -29,7 +30,8 @@ func SendHTTPJsonResponse(response http.ResponseWriter, response_map map[string]
 	response_data, parse_error = json.Marshal(response_map)
 
 	if parse_error != nil {
-		HandleHTTPErr(response, parse_error, 500)
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogInternalErr(parse_error)
 		return
 	}
 
