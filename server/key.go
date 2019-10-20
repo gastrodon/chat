@@ -89,10 +89,73 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	SendHTTPJsonResponse(response, response_map)
 }
 
+func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
+	var body []byte
+	var err error
+	body, err = ioutil.ReadAll(request.Body)
+
+	if err != nil {
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
+		return
+	}
+
+	var json_body struct {
+		Key    string `json:"key"`
+		UserID string `json:"user_id"`
+	}
+	err = json.Unmarshal(body, &json_body)
+
+	if err != nil {
+		HandleHTTPErr(response, "malformed_json", 400)
+		return
+	}
+
+	if json_body.Key == "" {
+		HandleHTTPErr(response, "key_missing", 400)
+		return
+	}
+
+	if json_body.UserID == "" {
+		HandleHTTPErr(response, "user_id_missing", 400)
+		return
+	}
+
+	var user models.User
+	var exists bool
+	user, exists, err = io.UserFromKey(json_body.Key)
+
+	if err != nil {
+		HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
+		return
+	}
+
+	if !exists {
+		HandleHTTPErr(response, "no_such_user", 404)
+		return
+	}
+
+	if json_body.UserID != user.ID {
+		HandleHTTPErr(response, "bad_key", 401)
+		return
+	}
+
+	io.DeleteKey(json_body.Key)
+
+	var response_map map[string]interface{} = map[string]interface{}{
+		"user_id": json_body.UserID,
+	}
+	SendHTTPJsonResponse(response, response_map)
+
+}
+
 func HandleKey(response http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case "POST":
 		postHandleKey(response, request)
+	case "DELETE":
+		deleteHandleKey(response, request)
 	default:
 		HandleHTTPErr(response, "bad_method", 405)
 	}
