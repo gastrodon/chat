@@ -136,6 +136,11 @@ func NewKey(user_id string, passwd string) (string, error) {
 	return key, nil
 }
 
+func DeleteKey(key string) bool {
+	delete(Session, key)
+	return true
+}
+
 /**
  * Get the user that is authenticated by some key
  * key      string  -> Key to find the owner of
