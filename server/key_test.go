@@ -255,3 +255,9 @@ func Test_deleteHandleKeyBadKey(test *testing.T) {
 func Test_HandleKeyBadMethod(test *testing.T) {
 	errKeyTest(test, "OOOO", "", "bad_method", 405)
 }
+
+func Test_deleteHandleKeyIntUserID(test *testing.T) {
+	var post_data string = "{\"password\":\"0\",\"user_id\":0}"
+
+	errKeyTest(test, "DELETE", post_data, "malformed_json", 400)
+}
