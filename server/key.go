@@ -121,9 +121,8 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	var user models.User
 	var exists bool
-	user, exists, err = io.UserFromKey(json_body.Key)
+	_, exists, err = io.UserFromKey(json_body.Key)
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -132,11 +131,6 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 	}
 
 	if !exists {
-		HandleHTTPErr(response, "no_such_user", 404)
-		return
-	}
-
-	if json_body.UserID != user.ID {
 		HandleHTTPErr(response, "bad_key", 401)
 		return
 	}
