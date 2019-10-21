@@ -12,7 +12,6 @@ import (
 )
 
 func HTTPTestRequest(method string, endpoint string, post_data *string, handler_func func(http.ResponseWriter, *http.Request)) (*httptest.ResponseRecorder, error) {
-	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
 	var request *http.Request
 	var err error
 	if post_data != nil {
@@ -21,12 +20,12 @@ func HTTPTestRequest(method string, endpoint string, post_data *string, handler_
 		request, err = http.NewRequest(method, endpoint, nil)
 	}
 
+	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
 	if err != nil {
 		return recorder, err
 	}
 
-	var handler http.HandlerFunc = http.HandlerFunc(handler_func)
-	handler.ServeHTTP(recorder, request)
+	http.HandlerFunc(handler_func).ServeHTTP(recorder, request)
 	return recorder, nil
 }
 
@@ -107,7 +106,7 @@ func deleteKeyTest(test *testing.T, user_id string, key string) {
 
 	_, exists, err = io.UserFromID(user_id)
 
-	if err != nil{
+	if err != nil {
 		test.Fatal(err)
 	}
 
@@ -117,18 +116,17 @@ func deleteKeyTest(test *testing.T, user_id string, key string) {
 }
 
 func errKeyTest(test *testing.T, method string, data string, error_desc string, code int) {
-	var post_data string = data
-	var handler http.HandlerFunc = http.HandlerFunc(HandleKey)
 	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
 
 	var request *http.Request
 	var err error
-	request, err = http.NewRequest(method, "/key", strings.NewReader(post_data))
+	request, err = http.NewRequest(method, "/key", strings.NewReader(data))
 	if err != nil {
 		test.Fatal(err)
 	}
 
-	handler.ServeHTTP(recorder, request)
+	http.HandlerFunc(HandleKey).ServeHTTP(recorder, request)
+
 	var response struct {
 		Error string `json:"error"`
 	}

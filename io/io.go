@@ -37,12 +37,12 @@ func assertPRNG() {
 }
 
 func random_string(size int) string {
-	const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
 	var byte_array []byte = make([]byte, size)
 	rand.Read(byte_array)
 
 	var index int
 	var value byte
+	const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_"
 	for index, value = range byte_array {
 		byte_array[index] = alphabet[value%byte(len(alphabet))]
 	}
@@ -74,10 +74,10 @@ func UpdateUname(user_id string, uname string) (models.User, error) {
  * return   User    -> Created `User`
  */
 func NewUser(uname string, passwd string) models.User {
-	var id string = uuid.NewV4().String()
 	var hashed hash.Hash = sha1.New()
 	hashed.Write([]byte(salt + passwd))
 
+	var id string = uuid.NewV4().String()
 	var user models.User = models.User{
 		Name: uname,
 		ID:   id,
@@ -152,9 +152,9 @@ func DeleteKey(key string) bool {
 func UserFromKey(key string) (models.User, bool, error) {
 	var exists bool
 	var user_id string
-	var user models.User
 	user_id, exists = Session[key]
 
+	var user models.User
 	if !exists {
 		return user, false, nil
 	}
@@ -171,7 +171,6 @@ func UserFromKey(key string) (models.User, bool, error) {
 func UserFromID(id string) (models.User, bool, error) {
 	var exists bool
 	var user models.User
-
 	user, exists = Users[id]
 
 	if !exists {
@@ -192,7 +191,6 @@ func UserFromID(id string) (models.User, bool, error) {
  */
 func NewRoom(room_name string, open bool, owner_id string) models.Room {
 	var id string = uuid.NewV4().String()
-
 	var room models.Room = models.Room{
 		Name:        room_name,
 		OwnerId:     owner_id,

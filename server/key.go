@@ -9,15 +9,9 @@ import (
 	"net/http"
 )
 
-// TODO: reorganize variable declaration
 func postHandleKey(response http.ResponseWriter, request *http.Request) {
-	var response_map map[string]interface{}
 	var body []byte
 	var err error
-	var json_body struct {
-		UserID   string `json:"user_id"`
-		Password string `json:"password"`
-	}
 
 	body, err = ioutil.ReadAll(request.Body)
 
@@ -27,6 +21,10 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	var json_body struct {
+		UserID   string `json:"user_id"`
+		Password string `json:"password"`
+	}
 	err = json.Unmarshal(body, &json_body)
 
 	if err != nil {
@@ -82,7 +80,7 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	response_map = map[string]interface{}{
+	var response_map map[string]interface{} = map[string]interface{}{
 		"key": key,
 	}
 

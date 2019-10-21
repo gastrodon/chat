@@ -18,8 +18,7 @@ func Test_random_string(test *testing.T) {
 }
 
 func Test_NewUser(test *testing.T) {
-	var passwd string = random_string(4)
-	var user models.User = NewUser("foobar", passwd)
+	var user models.User = NewUser("foobar", random_string(4))
 
 	if user != Users[user.ID] {
 		test.Errorf("NewUser got: %s, expected: %s", Users[user.ID], user)
@@ -57,10 +56,9 @@ func Test_CheckPasswdNoUser(test *testing.T) {
 
 func Test_NewKey(test *testing.T) {
 	var passwd string = random_string(4)
-	var user models.User = NewUser("foobar", passwd)
 	var key string
 	var err error
-	key, err = NewKey(user.ID, passwd)
+	key, err = NewKey(NewUser("foobar", passwd).ID, passwd)
 
 	if err != nil {
 		test.Error(err)
@@ -72,11 +70,10 @@ func Test_NewKey(test *testing.T) {
 }
 
 func Test_NewKeyBadPasswd(test *testing.T) {
-	var err_string string = "Password passed does not match password stored"
-	var user models.User = NewUser("foobar", random_string(4))
 	var err error
-	_, err = NewKey(user.ID, "")
+	_, err = NewKey(NewUser("foobar", random_string(4)).ID, "")
 
+	var err_string string = "Password passed does not match password stored"
 	if err.Error() != err_string {
 		test.Errorf("NewKey with bad password expected: %s, got: %s", err_string, err.Error())
 	}
@@ -86,11 +83,11 @@ func Test_UserFromKey(test *testing.T) {
 	var passwd string = random_string(4)
 	var user models.User = NewUser("foobar", passwd)
 	var key string
-	var fetched models.User
-	var err error
-	var exists bool
 	key, _ = NewKey(user.ID, passwd)
 
+	var fetched models.User
+	var exists bool
+	var err error
 	fetched, exists, err = UserFromKey(key)
 
 	if !exists {
@@ -122,11 +119,10 @@ func Test_UserFromKeyNoUser(test *testing.T) {
 }
 
 func Test_UserFromKeyDanglingID(test *testing.T) {
-	var user_id string = "foobar"
 	var key string = "barbaz"
+	var user_id string = "foobar"
 	Session[key] = user_id
 
-	var err_string string = fmt.Sprintf("key %s points to user_id %s, which does not exist", key, user_id)
 	var exists bool
 	var err error
 	_, exists, err = UserFromKey(key)
@@ -135,14 +131,14 @@ func Test_UserFromKeyDanglingID(test *testing.T) {
 		test.Errorf("UserFromKey dangling ID returns exists as true")
 	}
 
+	var err_string string = fmt.Sprintf("key %s points to user_id %s, which does not exist", key, user_id)
 	if err.Error() != err_string {
 		test.Errorf("UserFromKey bad key expected: %s, got %s", err_string, err.Error())
 	}
 }
 
 func Test_NewRoom(test *testing.T) {
-	var passwd string = random_string(4)
-	var user models.User = NewUser("foobar", passwd)
+	var user models.User = NewUser("foobar", random_string(4))
 	var room models.Room = NewRoom("fooroom", true, user.ID)
 
 	if Rooms[room.ID].ID != room.ID {
@@ -153,8 +149,7 @@ func Test_NewRoom(test *testing.T) {
 func Test_UpdateUname(test *testing.T) {
 	var uname string = "foobar"
 	var new_uname string = "Anonymous"
-	var passwd string = random_string(4)
-	var user models.User = NewUser(uname, passwd)
+	var user models.User = NewUser(uname, random_string(4))
 
 	if user.Name != uname {
 		test.Errorf("NewUser expected: %s, got: %s", uname, user.Name)
@@ -170,10 +165,10 @@ func Test_UpdateUname(test *testing.T) {
 
 func Test_UpdateUnameNoUser(test *testing.T) {
 	var user_id string = "foobar"
-	var err_string string = fmt.Sprintf("No user of user_id %s", user_id)
 	var err error
 	_, err = UpdateUname(user_id, "")
 
+	var err_string string = fmt.Sprintf("No user of user_id %s", user_id)
 	if err.Error() != err_string {
 		test.Errorf("UpdateUname no such ID expected: %s, got: %s", err_string, err.Error())
 	}

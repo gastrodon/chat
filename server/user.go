@@ -11,24 +11,15 @@ import (
 )
 
 func putHandleUser(response http.ResponseWriter, request *http.Request) {
-	var body []byte
-	var json_body struct {
-		Username string `json:"username"`
-	}
-
-	var response_map map[string]interface{}
-	var user models.User
-	var exists bool
-	var err error
-
 	if len(request.URL.Query()["key"]) == 0 {
 		HandleHTTPErr(response, "no_key", 401)
 		return
 	}
 
-	var key string = request.URL.Query()["key"][0]
-
-	user, exists, err = io.UserFromKey(key)
+	var user models.User
+	var exists bool
+	var err error
+	user, exists, err = io.UserFromKey(request.URL.Query()["key"][0])
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -41,6 +32,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	var body []byte
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
@@ -49,6 +41,9 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	var json_body struct {
+		Username string `json:"username"`
+	}
 	err = json.Unmarshal(body, &json_body)
 
 	if json_body.Username == "" {
@@ -63,7 +58,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	response_map = map[string]interface{}{
+	var response_map map[string]interface{} = map[string]interface{}{
 		"username": user.Name,
 	}
 
@@ -72,14 +67,8 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 }
 
 func postHandleUser(response http.ResponseWriter, request *http.Request) {
-	var response_map map[string]interface{}
 	var body []byte
 	var err error
-	var json_body struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
@@ -88,6 +77,10 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	var json_body struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
 	err = json.Unmarshal(body, &json_body)
 
 	if err != nil {
@@ -114,7 +107,7 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	response_map = map[string]interface{}{
+	var response_map map[string]interface{} = map[string]interface{}{
 		"user_id": user.ID,
 		"key":     key,
 	}
@@ -127,9 +120,6 @@ func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
 	var user models.User
 	var exists bool
 	var err error
-
-	var response_map map[string]interface{}
-
 	user, exists, err = io.UserFromID(id)
 
 	if !exists {
@@ -143,7 +133,7 @@ func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	response_map = map[string]interface{}{
+	var response_map map[string]interface{} = map[string]interface{}{
 		"username": user.Name,
 		"user_id":  user.ID,
 	}
