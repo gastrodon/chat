@@ -97,7 +97,9 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 		json_body.Username = "Anonymous"
 	}
 
-	var user models.User = io.NewUser(json_body.Username, json_body.Password)
+	var user models.User
+	user, _ = io.NewUser(json_body.Username, json_body.Password)
+	
 	var key string
 	key, err = io.NewKey(user.ID, json_body.Password)
 

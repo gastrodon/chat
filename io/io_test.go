@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"hash"
 	"testing"
+
 )
 
 func Test_random_string(test *testing.T) {
 	var size int = 32
-	var rand string = random_string(size)
+	var rand string
+	rand, _ = random_string(size)
 
 	if len(rand) != size {
 		test.Errorf("random_string size got: %d, expected: %d", len(rand), size)
@@ -18,7 +20,11 @@ func Test_random_string(test *testing.T) {
 }
 
 func Test_NewUser(test *testing.T) {
-	var user models.User = NewUser("foobar", random_string(4))
+	var rand string
+	rand, _ = random_string(4)
+
+	var user models.User
+	user, _ = NewUser("foobar", rand)
 
 	if user != Users[user.ID] {
 		test.Errorf("NewUser got: %s, expected: %s", Users[user.ID], user)
@@ -26,8 +32,12 @@ func Test_NewUser(test *testing.T) {
 }
 
 func Test_CheckPasswd(test *testing.T) {
-	var passwd string = random_string(4)
-	var user models.User = NewUser("foobar", passwd)
+	var passwd string
+	passwd, _ = random_string(4)
+
+	var user models.User
+	user, _ = NewUser("foobar", passwd)
+
 	var check bool
 	var err error
 	check, err = CheckPasswd(user.ID, passwd)
@@ -55,10 +65,15 @@ func Test_CheckPasswdNoUser(test *testing.T) {
 }
 
 func Test_NewKey(test *testing.T) {
-	var passwd string = random_string(4)
+	var passwd string
+	passwd, _ = random_string(4)
+
+	var user models.User
+	user, _ = NewUser("foobar", passwd)
+
 	var key string
 	var err error
-	key, err = NewKey(NewUser("foobar", passwd).ID, passwd)
+	key, err = NewKey(user.ID, passwd)
 
 	if err != nil {
 		test.Error(err)
@@ -70,8 +85,14 @@ func Test_NewKey(test *testing.T) {
 }
 
 func Test_NewKeyBadPasswd(test *testing.T) {
+	var rand string
+	rand, _ = random_string(4)
+
+	var user models.User
+	user, _ = NewUser("foobar", rand)
+
 	var err error
-	_, err = NewKey(NewUser("foobar", random_string(4)).ID, "")
+	_, err = NewKey(user.ID, "")
 
 	var err_string string = "Password passed does not match password stored"
 	if err.Error() != err_string {
@@ -80,8 +101,12 @@ func Test_NewKeyBadPasswd(test *testing.T) {
 }
 
 func Test_UserFromKey(test *testing.T) {
-	var passwd string = random_string(4)
-	var user models.User = NewUser("foobar", passwd)
+	var passwd string
+	passwd, _ = random_string(4)
+
+	var user models.User
+	user, _  = NewUser("foobar", passwd)
+
 	var key string
 	key, _ = NewKey(user.ID, passwd)
 
@@ -138,8 +163,14 @@ func Test_UserFromKeyDanglingID(test *testing.T) {
 }
 
 func Test_NewRoom(test *testing.T) {
-	var user models.User = NewUser("foobar", random_string(4))
-	var room models.Room = NewRoom("fooroom", true, user.ID)
+	var passwd string
+	passwd, _ = random_string(4)
+
+	var user models.User
+	user, _ = NewUser("foobar", passwd)
+
+	var room models.Room
+	room, _ = NewRoom("fooroom", true, user.ID)
 
 	if Rooms[room.ID].ID != room.ID {
 		test.Errorf("NewRoom got: %s, expected: %s", Rooms[room.ID].ID, room.ID)
@@ -149,7 +180,11 @@ func Test_NewRoom(test *testing.T) {
 func Test_UpdateUname(test *testing.T) {
 	var uname string = "foobar"
 	var new_uname string = "Anonymous"
-	var user models.User = NewUser(uname, random_string(4))
+	var rand string
+	rand, _ = random_string(4)
+
+	var user models.User
+	user, _ = NewUser(uname, rand)
 
 	if user.Name != uname {
 		test.Errorf("NewUser expected: %s, got: %s", uname, user.Name)
@@ -175,8 +210,11 @@ func Test_UpdateUnameNoUser(test *testing.T) {
 }
 
 func Test_UserFromID(test *testing.T) {
-	var uname, passwd string = random_string(4), random_string(4)
-	var user models.User = NewUser(uname, passwd)
+	var uname, passwd string
+	uname, _ = random_string(4)
+	passwd, _ =  random_string(4)
+	var user models.User
+	user, _ = NewUser(uname, passwd)
 
 	if user.Name != uname {
 		test.Errorf("NewUser expected: %s, got: %s", uname, user.Name)

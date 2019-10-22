@@ -23,7 +23,7 @@ func init() {
 	Users = make(map[string]models.User)
 	Session = make(map[string]string)
 	Login = make(map[string][]byte)
-	salt = random_string(16)
+	salt, _ = random_string(16)
 }
 
 func assertPRNG() {
@@ -36,7 +36,7 @@ func assertPRNG() {
 	}
 }
 
-func random_string(size int) string {
+func random_string(size int) (string, error) {
 	var byte_array []byte = make([]byte, size)
 	rand.Read(byte_array)
 
@@ -47,7 +47,7 @@ func random_string(size int) string {
 		byte_array[index] = alphabet[value%byte(len(alphabet))]
 	}
 
-	return string(byte_array)
+	return string(byte_array), nil
 }
 
 func UpdateUname(user_id string, uname string) (models.User, error) {
@@ -73,7 +73,7 @@ func UpdateUname(user_id string, uname string) (models.User, error) {
  *
  * return   User    -> Created `User`
  */
-func NewUser(uname string, passwd string) models.User {
+func NewUser(uname string, passwd string) (models.User, error) {
 	var hashed hash.Hash = sha1.New()
 	hashed.Write([]byte(salt + passwd))
 
@@ -85,7 +85,7 @@ func NewUser(uname string, passwd string) models.User {
 
 	Login[id] = hashed.Sum(nil)
 	Users[id] = user
-	return user
+	return user, nil
 }
 
 /**
@@ -131,7 +131,8 @@ func NewKey(user_id string, passwd string) (string, error) {
 		return "", errors.New("Password passed does not match password stored")
 	}
 
-	var key string = random_string(32)
+	var key string
+	key, _ = random_string(32)
 	Session[key] = user_id
 	return key, nil
 }
@@ -172,12 +173,7 @@ func UserFromID(id string) (models.User, bool, error) {
 	var exists bool
 	var user models.User
 	user, exists = Users[id]
-
-	if !exists {
-		return user, false, nil
-	}
-
-	return user, true, nil
+	return user, exists, nil
 
 }
 
@@ -189,7 +185,7 @@ func UserFromID(id string) (models.User, bool, error) {
  *
  * return           -> UUID of this room
  */
-func NewRoom(room_name string, open bool, owner_id string) models.Room {
+func NewRoom(room_name string, open bool, owner_id string) (models.Room, error) {
 	var id string = uuid.NewV4().String()
 	var room models.Room = models.Room{
 		Name:        room_name,
@@ -203,5 +199,5 @@ func NewRoom(room_name string, open bool, owner_id string) models.Room {
 	}
 
 	Rooms[id] = room
-	return room
+	return room, nil
 }

@@ -161,7 +161,8 @@ func Test_postHandleUserNoUname(test *testing.T) {
 }
 
 func Test_putNewUsername(test *testing.T) {
-	var user models.User = io.NewUser("foobar", "foobar2000")
+	var user models.User
+	user, _ = io.NewUser("foobar", "foobar2000")
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
@@ -194,7 +195,8 @@ func Test_putNewUsername(test *testing.T) {
 }
 
 func Test_putNewUsernameBlank(test *testing.T) {
-	var user models.User = io.NewUser("foobar", "foobar2000")
+	var user models.User
+	user, _ = io.NewUser("foobar", "foobar2000")
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
@@ -258,7 +260,8 @@ func Test_putHandleUserBadKey(test *testing.T) {
 }
 
 func Test_getHandleUserTree(test *testing.T) {
-	var user models.User = io.NewUser("foobar", "foobar2000")
+	var user models.User
+	user, _ = io.NewUser("foobar", "foobar2000")
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)

@@ -146,7 +146,8 @@ func errKeyTest(test *testing.T, method string, data string, error_desc string, 
 func Test_postHandleKey(test *testing.T) {
 	var uname string = "foobar"
 	var password string = "foobar2000"
-	var user models.User = io.NewUser(uname, password)
+	var user models.User
+	user, _ = io.NewUser(uname, password)
 
 	if user.Name != uname {
 		test.Fatalf("user.Name expected: %s got: %s", uname, user.Name)
@@ -157,7 +158,8 @@ func Test_postHandleKey(test *testing.T) {
 
 func Test_postHandleKeyWrongPasswd(test *testing.T) {
 	var passwd string = "foobar2000"
-	var user models.User = io.NewUser("foobar", passwd)
+	var user models.User
+	user, _ = io.NewUser("foobar", passwd)
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
@@ -201,7 +203,8 @@ func Test_postHandleKeyMalformed(test *testing.T) {
 func Test_deleteHandleKey(test *testing.T) {
 	var uname string = "foobar"
 	var password string = "foobar2000"
-	var user models.User = io.NewUser(uname, password)
+	var user models.User
+	user, _ = io.NewUser(uname, password)
 
 	if user.Name != uname {
 		test.Fatalf("user.Name expected: %s got: %s", uname, user.Name)
@@ -239,7 +242,8 @@ func Test_deleteHandleKeyNoSuchUser(test *testing.T) {
 func Test_deleteHandleKeyBadKey(test *testing.T) {
 	var uname string = "foobar"
 	var password string = "foobar2000"
-	var user models.User = io.NewUser(uname, password)
+	var user models.User
+	user, _ = io.NewUser(uname, password)
 
 	if user.Name != uname {
 		test.Fatalf("user.Name expected: %s got: %s", uname, user.Name)
