@@ -1,7 +1,7 @@
 package server
 
 import (
-	"chat/io"
+	"chat/storage"
 	"chat/models"
 	"chat/util"
 	"encoding/json"
@@ -44,7 +44,7 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 
 	var user models.User
 	var user_exists bool
-	user, user_exists, err = io.UserFromID(json_body.UserID)
+	user, user_exists, err = storage.UserFromID(json_body.UserID)
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -58,7 +58,7 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	}
 
 	var passwd_match bool
-	passwd_match, err = io.CheckPasswd(user.ID, json_body.Password)
+	passwd_match, err = storage.CheckPasswd(user.ID, json_body.Password)
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -72,7 +72,7 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	}
 
 	var key string
-	key, err = io.NewKey(user.ID, json_body.Password)
+	key, err = storage.NewKey(user.ID, json_body.Password)
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -120,7 +120,7 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 	}
 
 	var exists bool
-	_, exists, err = io.UserFromKey(json_body.Key)
+	_, exists, err = storage.UserFromKey(json_body.Key)
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -133,7 +133,7 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	io.DeleteKey(json_body.Key)
+	storage.DeleteKey(json_body.Key)
 
 	var response_map map[string]interface{} = map[string]interface{}{
 		"user_id": json_body.UserID,

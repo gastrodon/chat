@@ -1,7 +1,7 @@
 package server
 
 import (
-	"chat/io"
+	"chat/storage"
 	"chat/models"
 	"encoding/json"
 	"fmt"
@@ -50,7 +50,7 @@ func postKeyTest(test *testing.T, user_id string, password string) {
 
 	var user models.User
 	var exists bool
-	user, exists, err = io.UserFromKey(response.Key)
+	user, exists, err = storage.UserFromKey(response.Key)
 
 	if err != nil {
 		test.Fatal(err)
@@ -94,7 +94,7 @@ func deleteKeyTest(test *testing.T, user_id string, key string) {
 	}
 
 	var exists bool
-	_, exists, err = io.UserFromKey(key)
+	_, exists, err = storage.UserFromKey(key)
 
 	if err != nil {
 		test.Fatal(err)
@@ -104,7 +104,7 @@ func deleteKeyTest(test *testing.T, user_id string, key string) {
 		test.Error("UserFromKey key does exist")
 	}
 
-	_, exists, err = io.UserFromID(user_id)
+	_, exists, err = storage.UserFromID(user_id)
 
 	if err != nil {
 		test.Fatal(err)
@@ -147,7 +147,7 @@ func Test_postHandleKey(test *testing.T) {
 	var uname string = "foobar"
 	var password string = "foobar2000"
 	var user models.User
-	user, _ = io.NewUser(uname, password)
+	user, _ = storage.NewUser(uname, password)
 
 	if user.Name != uname {
 		test.Fatalf("user.Name expected: %s got: %s", uname, user.Name)
@@ -159,7 +159,7 @@ func Test_postHandleKey(test *testing.T) {
 func Test_postHandleKeyWrongPasswd(test *testing.T) {
 	var passwd string = "foobar2000"
 	var user models.User
-	user, _ = io.NewUser("foobar", passwd)
+	user, _ = storage.NewUser("foobar", passwd)
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
@@ -204,7 +204,7 @@ func Test_deleteHandleKey(test *testing.T) {
 	var uname string = "foobar"
 	var password string = "foobar2000"
 	var user models.User
-	user, _ = io.NewUser(uname, password)
+	user, _ = storage.NewUser(uname, password)
 
 	if user.Name != uname {
 		test.Fatalf("user.Name expected: %s got: %s", uname, user.Name)
@@ -212,7 +212,7 @@ func Test_deleteHandleKey(test *testing.T) {
 
 	var key string
 	var err error
-	key, err = io.NewKey(user.ID, password)
+	key, err = storage.NewKey(user.ID, password)
 
 	if err != nil {
 		test.Fatal(err)
@@ -243,7 +243,7 @@ func Test_deleteHandleKeyBadKey(test *testing.T) {
 	var uname string = "foobar"
 	var password string = "foobar2000"
 	var user models.User
-	user, _ = io.NewUser(uname, password)
+	user, _ = storage.NewUser(uname, password)
 
 	if user.Name != uname {
 		test.Fatalf("user.Name expected: %s got: %s", uname, user.Name)

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"chat/io"
+	"chat/storage"
 	"chat/models"
 	"chat/util"
 	"encoding/json"
@@ -19,7 +19,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	var user models.User
 	var exists bool
 	var err error
-	user, exists, err = io.UserFromKey(request.URL.Query()["key"][0])
+	user, exists, err = storage.UserFromKey(request.URL.Query()["key"][0])
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -50,7 +50,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 		json_body.Username = "Anonymous"
 	}
 
-	user, err = io.UpdateUname(user.ID, json_body.Username)
+	user, err = storage.UpdateUname(user.ID, json_body.Username)
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -98,10 +98,10 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	}
 
 	var user models.User
-	user, _ = io.NewUser(json_body.Username, json_body.Password)
+	user, _ = storage.NewUser(json_body.Username, json_body.Password)
 	
 	var key string
-	key, err = io.NewKey(user.ID, json_body.Password)
+	key, err = storage.NewKey(user.ID, json_body.Password)
 
 	if err != nil {
 		HandleHTTPErr(response, "internal_err", 500)
@@ -122,7 +122,7 @@ func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
 	var user models.User
 	var exists bool
 	var err error
-	user, exists, err = io.UserFromID(id)
+	user, exists, err = storage.UserFromID(id)
 
 	if !exists {
 		HandleHTTPErr(response, "no_such_user", 404)

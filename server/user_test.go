@@ -1,7 +1,7 @@
 package server
 
 import (
-	"chat/io"
+	"chat/storage"
 	"chat/models"
 	"encoding/json"
 	"fmt"
@@ -162,7 +162,7 @@ func Test_postHandleUserNoUname(test *testing.T) {
 
 func Test_putNewUsername(test *testing.T) {
 	var user models.User
-	user, _ = io.NewUser("foobar", "foobar2000")
+	user, _ = storage.NewUser("foobar", "foobar2000")
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
@@ -170,7 +170,7 @@ func Test_putNewUsername(test *testing.T) {
 
 	var key string
 	var err error
-	key, err = io.NewKey(user.ID, "foobar2000")
+	key, err = storage.NewKey(user.ID, "foobar2000")
 
 	if err != nil {
 		test.Fatal(err)
@@ -179,7 +179,7 @@ func Test_putNewUsername(test *testing.T) {
 	putUserTest(test, "{\"username\":\"foobar3000\"}", key)
 
 	var exists bool
-	user, exists, err = io.UserFromKey(key)
+	user, exists, err = storage.UserFromKey(key)
 
 	if !exists {
 		test.Fatalf("User with key %s does not exist", key)
@@ -196,7 +196,7 @@ func Test_putNewUsername(test *testing.T) {
 
 func Test_putNewUsernameBlank(test *testing.T) {
 	var user models.User
-	user, _ = io.NewUser("foobar", "foobar2000")
+	user, _ = storage.NewUser("foobar", "foobar2000")
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
@@ -204,7 +204,7 @@ func Test_putNewUsernameBlank(test *testing.T) {
 
 	var key string
 	var err error
-	key, err = io.NewKey(user.ID, "foobar2000")
+	key, err = storage.NewKey(user.ID, "foobar2000")
 
 	if err != nil {
 		test.Fatal(err)
@@ -213,7 +213,7 @@ func Test_putNewUsernameBlank(test *testing.T) {
 	putUserTest(test, "", key)
 
 	var exists bool
-	user, exists, err = io.UserFromKey(key)
+	user, exists, err = storage.UserFromKey(key)
 
 	if !exists {
 		test.Fatalf("User with key %s does not exist", key)
@@ -261,7 +261,7 @@ func Test_putHandleUserBadKey(test *testing.T) {
 
 func Test_getHandleUserTree(test *testing.T) {
 	var user models.User
-	user, _ = io.NewUser("foobar", "foobar2000")
+	user, _ = storage.NewUser("foobar", "foobar2000")
 
 	if user.Name != "foobar" {
 		test.Fatalf("user.Name expected: foobar, got: %s", user.Name)
