@@ -1,4 +1,4 @@
-package server
+package key
 
 import (
 	"chat/storage"
@@ -16,7 +16,7 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -28,17 +28,17 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	err = json.Unmarshal(body, &json_body)
 
 	if err != nil {
-		HandleHTTPErr(response, "malformed_json", 400)
+		util.HandleHTTPErr(response, "malformed_json", 400)
 		return
 	}
 
 	if json_body.Password == "" {
-		HandleHTTPErr(response, "password_missing", 400)
+		util.HandleHTTPErr(response, "password_missing", 400)
 		return
 	}
 
 	if json_body.UserID == "" {
-		HandleHTTPErr(response, "user_id_missing", 400)
+		util.HandleHTTPErr(response, "user_id_missing", 400)
 		return
 	}
 
@@ -47,13 +47,13 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	user, user_exists, err = storage.UserFromID(json_body.UserID)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
 
 	if !user_exists {
-		HandleHTTPErr(response, "no_such_user", 404)
+		util.HandleHTTPErr(response, "no_such_user", 404)
 		return
 	}
 
@@ -61,13 +61,13 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	passwd_match, err = storage.CheckPasswd(user.ID, json_body.Password)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
 
 	if !passwd_match {
-		HandleHTTPErr(response, "bad_password", 403)
+		util.HandleHTTPErr(response, "bad_password", 403)
 		return
 	}
 
@@ -75,7 +75,7 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 	key, err = storage.NewKey(user.ID, json_body.Password)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -84,7 +84,7 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 		"key": key,
 	}
 
-	SendHTTPJsonResponse(response, response_map)
+	util.SendHTTPJsonResponse(response, response_map)
 }
 
 func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
@@ -93,7 +93,7 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -105,17 +105,17 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 	err = json.Unmarshal(body, &json_body)
 
 	if err != nil {
-		HandleHTTPErr(response, "malformed_json", 400)
+		util.HandleHTTPErr(response, "malformed_json", 400)
 		return
 	}
 
 	if json_body.Key == "" {
-		HandleHTTPErr(response, "key_missing", 400)
+		util.HandleHTTPErr(response, "key_missing", 400)
 		return
 	}
 
 	if json_body.UserID == "" {
-		HandleHTTPErr(response, "user_id_missing", 400)
+		util.HandleHTTPErr(response, "user_id_missing", 400)
 		return
 	}
 
@@ -123,13 +123,13 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 	_, exists, err = storage.UserFromKey(json_body.Key)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
 
 	if !exists {
-		HandleHTTPErr(response, "bad_key", 401)
+		util.HandleHTTPErr(response, "bad_key", 401)
 		return
 	}
 
@@ -138,7 +138,7 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 	var response_map map[string]interface{} = map[string]interface{}{
 		"user_id": json_body.UserID,
 	}
-	SendHTTPJsonResponse(response, response_map)
+	util.SendHTTPJsonResponse(response, response_map)
 
 }
 
@@ -149,6 +149,6 @@ func HandleKey(response http.ResponseWriter, request *http.Request) {
 	case "DELETE":
 		deleteHandleKey(response, request)
 	default:
-		HandleHTTPErr(response, "bad_method", 405)
+		util.HandleHTTPErr(response, "bad_method", 405)
 	}
 }

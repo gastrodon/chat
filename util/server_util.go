@@ -1,7 +1,6 @@
-package server
+package util
 
 import (
-	"chat/util"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -18,7 +17,7 @@ func HandleHTTPErr(response http.ResponseWriter, err string, code int) {
 
 	if parse_error != nil {
 		http.Error(response, "internal_err", 500)
-		util.LogInternalError(parse_error)
+		LogInternalError(parse_error)
 		return
 	}
 
@@ -32,7 +31,7 @@ func SendHTTPJsonResponse(response http.ResponseWriter, response_map map[string]
 
 	if parse_error != nil {
 		HandleHTTPErr(response, "internal_err", 500)
-		util.LogInternalError(parse_error)
+		LogInternalError(parse_error)
 		return
 	}
 

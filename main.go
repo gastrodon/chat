@@ -1,7 +1,8 @@
 package chat
 
 import (
-	"chat/server"
+	"chat/server/key"
+	"chat/server/user"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,9 +15,9 @@ func main() {
 		port = fmt.Sprintf(":%s", os.Args[1])
 	}
 
-	http.HandleFunc("/key", server.HandleKey)
-	http.HandleFunc("/user", server.HandleUser)
-	http.HandleFunc("/user/", server.HandleUserTree)
+	http.HandleFunc("/key", key.HandleKey)
+	http.HandleFunc("/user", user.HandleUser)
+	http.HandleFunc("/user/", user.HandleUserTree)
 
 	http.ListenAndServe(port, nil)
 }

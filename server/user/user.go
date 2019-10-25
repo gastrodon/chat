@@ -1,4 +1,4 @@
-package server
+package user
 
 import (
 	"chat/storage"
@@ -12,7 +12,7 @@ import (
 
 func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	if len(request.URL.Query()["key"]) == 0 {
-		HandleHTTPErr(response, "no_key", 401)
+		util.HandleHTTPErr(response, "no_key", 401)
 		return
 	}
 
@@ -22,13 +22,13 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	user, exists, err = storage.UserFromKey(request.URL.Query()["key"][0])
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
 
 	if !exists {
-		HandleHTTPErr(response, "bad_key", 401)
+		util.HandleHTTPErr(response, "bad_key", 401)
 		return
 	}
 
@@ -36,7 +36,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -53,7 +53,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 	user, err = storage.UpdateUname(user.ID, json_body.Username)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -62,7 +62,7 @@ func putHandleUser(response http.ResponseWriter, request *http.Request) {
 		"username": user.Name,
 	}
 
-	SendHTTPJsonResponse(response, response_map)
+	util.SendHTTPJsonResponse(response, response_map)
 	return
 }
 
@@ -72,7 +72,7 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	body, err = ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -84,12 +84,12 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 	err = json.Unmarshal(body, &json_body)
 
 	if err != nil {
-		HandleHTTPErr(response, "malformed_json", 400)
+		util.HandleHTTPErr(response, "malformed_json", 400)
 		return
 	}
 
 	if json_body.Password == "" {
-		HandleHTTPErr(response, "password_missing", 400)
+		util.HandleHTTPErr(response, "password_missing", 400)
 		return
 	}
 
@@ -99,12 +99,12 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 
 	var user models.User
 	user, _ = storage.NewUser(json_body.Username, json_body.Password)
-	
+
 	var key string
 	key, err = storage.NewKey(user.ID, json_body.Password)
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -114,7 +114,7 @@ func postHandleUser(response http.ResponseWriter, request *http.Request) {
 		"key":     key,
 	}
 
-	SendHTTPJsonResponse(response, response_map)
+	util.SendHTTPJsonResponse(response, response_map)
 }
 
 func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
@@ -125,12 +125,12 @@ func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
 	user, exists, err = storage.UserFromID(id)
 
 	if !exists {
-		HandleHTTPErr(response, "no_such_user", 404)
+		util.HandleHTTPErr(response, "no_such_user", 404)
 		return
 	}
 
 	if err != nil {
-		HandleHTTPErr(response, "internal_err", 500)
+		util.HandleHTTPErr(response, "internal_err", 500)
 		util.LogHandlerError(request, err)
 		return
 	}
@@ -140,7 +140,7 @@ func getHandleUserTree(response http.ResponseWriter, request *http.Request) {
 		"user_id":  user.ID,
 	}
 
-	SendHTTPJsonResponse(response, response_map)
+	util.SendHTTPJsonResponse(response, response_map)
 	return
 }
 
@@ -153,7 +153,7 @@ func HandleUser(response http.ResponseWriter, request *http.Request) {
 		putHandleUser(response, request)
 		return
 	default:
-		HandleHTTPErr(response, "bad_method", 405)
+		util.HandleHTTPErr(response, "bad_method", 405)
 	}
 }
 
@@ -163,6 +163,6 @@ func HandleUserTree(response http.ResponseWriter, request *http.Request) {
 		getHandleUserTree(response, request)
 		return
 	default:
-		HandleHTTPErr(response, "bad_method", 405)
+		util.HandleHTTPErr(response, "bad_method", 405)
 	}
 }
