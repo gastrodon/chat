@@ -88,6 +88,13 @@ func postHandleKey(response http.ResponseWriter, request *http.Request) {
 }
 
 func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
+	if len(request.URL.Query()["key"]) == 0 {
+		util.HandleHTTPErr(response, "no_key", 401)
+		return
+	}
+
+	var key string = request.URL.Query()["key"][0]
+
 	var body []byte
 	var err error
 	body, err = ioutil.ReadAll(request.Body)
@@ -99,7 +106,6 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 	}
 
 	var json_body struct {
-		Key    string `json:"key"`
 		UserID string `json:"user_id"`
 	}
 	err = json.Unmarshal(body, &json_body)
@@ -109,18 +115,13 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if json_body.Key == "" {
-		util.HandleHTTPErr(response, "key_missing", 400)
-		return
-	}
-
 	if json_body.UserID == "" {
 		util.HandleHTTPErr(response, "user_id_missing", 400)
 		return
 	}
 
 	var exists bool
-	_, exists, err = storage.UserFromKey(json_body.Key)
+	_, exists, err = storage.UserFromKey(key)
 
 	if err != nil {
 		util.HandleHTTPErr(response, "internal_err", 500)
@@ -133,7 +134,7 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	storage.DeleteKey(json_body.Key)
+	storage.DeleteKey(key)
 
 	var response_map map[string]interface{} = map[string]interface{}{
 		"user_id": json_body.UserID,

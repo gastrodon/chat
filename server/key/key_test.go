@@ -71,10 +71,10 @@ func postKeyTest(test *testing.T, user_id string, password string) {
 }
 
 func deleteKeyTest(test *testing.T, user_id string, key string) {
-	var post_data string = fmt.Sprintf("{\"user_id\":\"%s\",\"key\":\"%s\"}", user_id, key)
+	var post_data string = fmt.Sprintf("{\"user_id\":\"%s\"}", user_id)
 	var recorder *httptest.ResponseRecorder
 	var err error
-	recorder, err = HTTPTestRequest("DELETE", "/key", &post_data, HandleKey)
+	recorder, err = HTTPTestRequest("DELETE", fmt.Sprintf("/key?key=%s", key), &post_data, HandleKey)
 
 	if err != nil {
 		test.Fatal(err)
@@ -115,12 +115,17 @@ func deleteKeyTest(test *testing.T, user_id string, key string) {
 	}
 }
 
-func errKeyTest(test *testing.T, method string, data string, error_desc string, code int) {
+func errKeyTest(test *testing.T, method string, data string, key *string, error_desc string, code int) {
 	var recorder *httptest.ResponseRecorder = httptest.NewRecorder()
 
 	var request *http.Request
 	var err error
-	request, err = http.NewRequest(method, "/key", strings.NewReader(data))
+	if key != nil {
+		request, err = http.NewRequest(method, fmt.Sprintf("/key?key=%s", *key), strings.NewReader(data))
+	} else {
+		request, err = http.NewRequest(method, "/key?key=%s", strings.NewReader(data))
+
+	}
 	if err != nil {
 		test.Fatal(err)
 	}
@@ -167,37 +172,37 @@ func Test_postHandleKeyWrongPasswd(test *testing.T) {
 
 	var post_data string = fmt.Sprintf("{\"user_id\":\"%s\",\"password\":\"oof!\"}", user.ID)
 
-	errKeyTest(test, "POST", post_data, "bad_password", 403)
+	errKeyTest(test, "POST", post_data, nil, "bad_password", 403)
 }
 
 func Test_postHandleKeyMissingPasswd(test *testing.T) {
 	var post_data string = "{\"user_id\":\"0\"}"
 
-	errKeyTest(test, "POST", post_data, "password_missing", 400)
+	errKeyTest(test, "POST", post_data, nil, "password_missing", 400)
 }
 
 func Test_postHandleKeyMissingUserID(test *testing.T) {
 	var post_data string = "{\"password\":\"0\"}"
 
-	errKeyTest(test, "POST", post_data, "user_id_missing", 400)
+	errKeyTest(test, "POST", post_data, nil, "user_id_missing", 400)
 }
 
 func Test_postHandleKeyNoSuchUser(test *testing.T) {
 	var post_data string = "{\"password\":\"0\",\"user_id\":\"0\"}"
 
-	errKeyTest(test, "POST", post_data, "no_such_user", 404)
+	errKeyTest(test, "POST", post_data, nil, "no_such_user", 404)
 }
 
 func Test_postHandleKeyIntUserID(test *testing.T) {
 	var post_data string = "{\"password\":\"0\",\"user_id\":0}"
 
-	errKeyTest(test, "POST", post_data, "malformed_json", 400)
+	errKeyTest(test, "POST", post_data, nil, "malformed_json", 400)
 }
 
 func Test_postHandleKeyMalformed(test *testing.T) {
 	var post_data string = "Wait, this isn't json!{{{{{{]]][:]}"
 
-	errKeyTest(test, "POST", post_data, "malformed_json", 400)
+	errKeyTest(test, "POST", post_data, nil, "malformed_json", 400)
 }
 
 func Test_deleteHandleKey(test *testing.T) {
@@ -224,19 +229,21 @@ func Test_deleteHandleKey(test *testing.T) {
 func Test_deleteHandleKeyMissingKey(test *testing.T) {
 	var post_data string = "{\"user_id\":\"0\"}"
 
-	errKeyTest(test, "DELETE", post_data, "key_missing", 400)
+	errKeyTest(test, "DELETE", post_data, nil, "no_key", 401)
 }
 
 func Test_deleteHandleKeyMissingUserID(test *testing.T) {
-	var post_data string = "{\"key\":\"0\"}"
+	var post_data string = "{}"
 
-	errKeyTest(test, "DELETE", post_data, "user_id_missing", 400)
+	var key string = "0"
+	errKeyTest(test, "DELETE", post_data, &key, "user_id_missing", 400)
 }
 
 func Test_deleteHandleKeyNoSuchUser(test *testing.T) {
 	var post_data string = "{\"key\":\"0\",\"user_id\":\"0\"}"
 
-	errKeyTest(test, "DELETE", post_data, "bad_key", 401)
+	var key string = "0"
+	errKeyTest(test, "DELETE", post_data, &key, "bad_key", 401)
 }
 
 func Test_deleteHandleKeyBadKey(test *testing.T) {
@@ -249,17 +256,19 @@ func Test_deleteHandleKeyBadKey(test *testing.T) {
 		test.Fatalf("user.Name expected: %s got: %s", uname, user.Name)
 	}
 
-	var post_data string = fmt.Sprintf("{\"key\":\"0\",\"user_id\":\"%s\"}", user.ID)
+	var post_data string = fmt.Sprintf("{\"user_id\":\"%s\"}", user.ID)
 
-	errKeyTest(test, "DELETE", post_data, "bad_key", 401)
+	var key string = "0"
+	errKeyTest(test, "DELETE", post_data, &key, "bad_key", 401)
 }
 
 func Test_HandleKeyBadMethod(test *testing.T) {
-	errKeyTest(test, "OOOO", "", "bad_method", 405)
+	errKeyTest(test, "OOOO", "", nil, "bad_method", 405)
 }
 
 func Test_deleteHandleKeyIntUserID(test *testing.T) {
 	var post_data string = "{\"password\":\"0\",\"user_id\":0}"
 
-	errKeyTest(test, "DELETE", post_data, "malformed_json", 400)
+	var key string = ""
+	errKeyTest(test, "DELETE", post_data, &key, "malformed_json", 400)
 }
