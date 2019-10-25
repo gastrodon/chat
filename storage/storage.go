@@ -137,9 +137,9 @@ func NewKey(user_id string, passwd string) (string, error) {
 	return key, nil
 }
 
-func DeleteKey(key string) bool {
+func DeleteKey(key string) error {
 	delete(Session, key)
-	return true
+	return nil
 }
 
 /**
@@ -200,4 +200,9 @@ func NewRoom(room_name string, open bool, owner_id string) (models.Room, error) 
 
 	Rooms[id] = room
 	return room, nil
+}
+
+func DeleteRoom(id string) error {
+	delete(Rooms, id)
+	return nil
 }

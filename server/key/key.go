@@ -134,7 +134,13 @@ func deleteHandleKey(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	storage.DeleteKey(key)
+	err = storage.DeleteKey(key)
+
+	if err != nil {
+		util.HandleHTTPErr(response, "internal_err", 500)
+		util.LogHandlerError(request, err)
+		return
+	}
 
 	var response_map map[string]interface{} = map[string]interface{}{
 		"user_id": json_body.UserID,
