@@ -1,4 +1,4 @@
-package main
+package chat
 
 import (
 	"chat/server"
@@ -15,7 +15,6 @@ func main() {
 	}
 
 	http.HandleFunc("/key", server.HandleKey)
-
 	http.HandleFunc("/user", server.HandleUser)
 	http.HandleFunc("/user/", server.HandleUserTree)
 
