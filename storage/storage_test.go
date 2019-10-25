@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"hash"
 	"testing"
-
 )
 
 func Test_random_string(test *testing.T) {
@@ -105,7 +104,7 @@ func Test_UserFromKey(test *testing.T) {
 	passwd, _ = random_string(4)
 
 	var user models.User
-	user, _  = NewUser("foobar", passwd)
+	user, _ = NewUser("foobar", passwd)
 
 	var key string
 	key, _ = NewKey(user.ID, passwd)
@@ -212,7 +211,7 @@ func Test_UpdateUnameNoUser(test *testing.T) {
 func Test_UserFromID(test *testing.T) {
 	var uname, passwd string
 	uname, _ = random_string(4)
-	passwd, _ =  random_string(4)
+	passwd, _ = random_string(4)
 	var user models.User
 	user, _ = NewUser(uname, passwd)
 

@@ -1,7 +1,8 @@
-package chat
+package main
 
 import (
 	"chat/server/key"
+	"chat/server/room"
 	"chat/server/user"
 	"fmt"
 	"net/http"
@@ -18,6 +19,7 @@ func main() {
 	http.HandleFunc("/key", key.HandleKey)
 	http.HandleFunc("/user", user.HandleUser)
 	http.HandleFunc("/user/", user.HandleUserTree)
+	http.HandleFunc("/room", room.HandleRoom)
 
 	http.ListenAndServe(port, nil)
 }

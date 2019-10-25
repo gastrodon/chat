@@ -1,8 +1,8 @@
 package user
 
 import (
-	"chat/storage"
 	"chat/models"
+	"chat/storage"
 	"encoding/json"
 	"fmt"
 	"net/http"

@@ -1,8 +1,8 @@
 package key
 
 import (
-	"chat/storage"
 	"chat/models"
+	"chat/storage"
 	"chat/util"
 	"encoding/json"
 	"io/ioutil"
